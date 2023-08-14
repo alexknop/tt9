@@ -120,19 +120,12 @@ public class ModePredictive extends InputMode {
 		if (
 			lastAcceptedWord.isEmpty()
 			|| suggestions.isEmpty()
-			|| !suggestions.get(0).toLowerCase(language.getLocale()).startsWith(lastAcceptedWord.toLowerCase(language.getLocale()))
 		) {
 			return;
 		}
 
 		int lastAcceptedWordLength = lastAcceptedWord.length();
 		digitSequence = digitSequence.length() > lastAcceptedWordLength ? digitSequence.substring(lastAcceptedWordLength) : "";
-
-		ArrayList<String> lastSuggestions = new ArrayList<>(suggestions);
-		suggestions.clear();
-		for (String s : lastSuggestions) {
-			suggestions.add(s.length() >= lastAcceptedWordLength ? s.substring(lastAcceptedWordLength) : "");
-		}
 	}
 
 
@@ -324,6 +317,8 @@ public class ModePredictive extends InputMode {
 		/**
 	 * shouldAcceptPreviousSuggestion
 	 * Variant for post suggestion load analysis.
+		 * After suggestions are loaded, check if the user just typed 1,
+		 * if so then suggestion prior to 1 is to be committed.
 	 */
 	@Override
 	public boolean shouldAcceptPreviousSuggestion() {
@@ -331,9 +326,9 @@ public class ModePredictive extends InputMode {
 			(autoAcceptTimeout == 0 && !digitSequence.startsWith("0"))
 			|| (
 				!digitSequence.isEmpty()
-				&& !predictions.areThereDbWords()
-				&& digitSequence.contains("1")
-				&& TextTools.containsOtherThan1(digitSequence)
+					&& digitSequence.contains("1")
+					&& digitSequence.charAt(0) != '1'
+				  && TextTools.containsOtherThan1(digitSequence)
 			);
 	}
 

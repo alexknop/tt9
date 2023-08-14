@@ -26,8 +26,9 @@ public class Predictions {
 	private boolean areThereDbWords = false;
 	private final ArrayList<String> words = new ArrayList<>();
 
-	// punctuation/emoji
-	private final Pattern containsOnly1Regex = Pattern.compile("^1+$");
+	// emoji
+	private final Pattern contains1TwiceRegex = Pattern.compile("\\d*1{2,}$");
+
 	private final String maxEmojiSequence;
 
 
@@ -83,10 +84,6 @@ public class Predictions {
 		return words;
 	}
 
-	public boolean areThereDbWords() {
-		return areThereDbWords;
-	}
-
 
 	/**
 	 * suggestStem
@@ -128,14 +125,27 @@ public class Predictions {
 		if (loadStatic()) {
 			onWordsChanged.run();
 		} else {
-			DictionaryDb.getWords(
-				(words) -> onDbWords(words, true),
-				language,
-				digitSequence,
-				stem,
-				settings.getSuggestionsMin(),
-				settings.getSuggestionsMax()
-			);
+			//if user enters a 1, either query just the one key or if a user
+			//types fast and it is 1###, include 1###
+			if (digitSequence.contains("1")) {
+				DictionaryDb.getWords(
+					(words) -> onDbWords(words, true),
+					language,
+					digitSequence.substring(digitSequence.indexOf("1")),
+					stem,
+					settings.getSuggestionsMin(),
+					settings.getSuggestionsMax()
+				);
+			} else {
+				DictionaryDb.getWords(
+					(words) -> onDbWords(words, true),
+					language,
+					digitSequence,
+					stem,
+					settings.getSuggestionsMin(),
+					settings.getSuggestionsMax()
+				);
+			}
 		}
 	}
 
@@ -159,15 +169,12 @@ public class Predictions {
 			words.add(settings.getDoubleZeroChar());
 		}
 		// emoji
-		else if (containsOnly1Regex.matcher(digitSequence).matches()) {
+		else if (contains1TwiceRegex.matcher(digitSequence).matches()) {
 			stem = "";
 			words.clear();
-			if (digitSequence.length() == 1) {
-				words.addAll(language.getKeyCharacters(1, false));
-			} else {
-				digitSequence = digitSequence.length() <= maxEmojiSequence.length() ? digitSequence : maxEmojiSequence;
-				words.addAll(Characters.getEmoji(digitSequence.length() - 2));
-			}
+			digitSequence = digitSequence.length() <= maxEmojiSequence.length() ? digitSequence : maxEmojiSequence;
+			words.addAll(Characters.getEmoji(digitSequence.length() - 2));
+
 		} else {
 			return false;
 		}
@@ -205,7 +212,7 @@ public class Predictions {
 
 		// If there were no database words for ",a", try getting the letters only (e.g. "a", "b", "c").
 		// We do this to display them in the correct order.
-		if (dbWords.isEmpty() && isRetryAllowed && digitSequence.length() == 2 && digitSequence.charAt(0) == '1') {
+		if (dbWords.isEmpty() && isRetryAllowed && digitSequence.length() == 2 && digitSequence.charAt(0) == '1' && !inputWord.isEmpty()) {
 			loadWithoutLeadingPunctuation();
 			return;
 		}
@@ -239,9 +246,16 @@ public class Predictions {
 		// Make sure the displayed word and the digit sequence, we will be generating suggestions from,
 		// have the same length, to prevent visual discrepancies.
 		baseWord = (baseWord != null && !baseWord.isEmpty()) ? baseWord.substring(0, Math.min(digitSequence.length() - 1, baseWord.length())) : "";
-
+		int lastSequenceDigit;
 		// append all letters for the last digit in the sequence (the last pressed key)
-		int lastSequenceDigit = digitSequence.charAt(digitSequence.length() - 1) - '0';
+		// unless the user presses 1, in which we want to break from the base word and only
+		// provide punctuation marks from the user.
+		if (digitSequence.contains("1")) {
+			lastSequenceDigit = 1;
+			baseWord = "";
+		}	else {
+			lastSequenceDigit = digitSequence.charAt(digitSequence.length() - 1) - '0';
+		}
 		for (String keyLetter : language.getKeyCharacters(lastSequenceDigit, false)) {
 			generatedWords.add(baseWord + keyLetter);
 		}
