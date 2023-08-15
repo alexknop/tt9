@@ -20,7 +20,8 @@ public class Predictions {
 	private String inputWord;
 
 	// async operations
-	private Runnable onWordsChanged = () -> {};
+	private Runnable onWordsChanged = () -> {
+	};
 
 	// data
 	private boolean areThereDbWords = false;
@@ -127,14 +128,14 @@ public class Predictions {
 		} else {
 			DictionaryDb.getWords(
 				(words) -> onDbWords(words, true),
-					language,
-					digitSequence,
-					stem,
-					settings.getSuggestionsMin(),
-					settings.getSuggestionsMax()
-				);
-			}
+				language,
+				digitSequence,
+				stem,
+				settings.getSuggestionsMin(),
+				settings.getSuggestionsMax()
+			);
 		}
+	}
 
 
 	/**
