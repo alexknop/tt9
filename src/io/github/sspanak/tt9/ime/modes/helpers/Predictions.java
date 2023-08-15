@@ -125,8 +125,8 @@ public class Predictions {
 		if (loadStatic()) {
 			onWordsChanged.run();
 		} else {
-				DictionaryDb.getWords(
-					(words) -> onDbWords(words, true),
+			DictionaryDb.getWords(
+				(words) -> onDbWords(words, true),
 					language,
 					digitSequence,
 					stem,
