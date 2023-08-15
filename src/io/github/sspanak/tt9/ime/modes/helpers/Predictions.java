@@ -20,11 +20,9 @@ public class Predictions {
 	private String inputWord;
 
 	// async operations
-	private Runnable onWordsChanged = () -> {
-	};
+	private Runnable onWordsChanged = () -> {};
 
 	// data
-	private boolean areThereDbWords = false;
 	private final ArrayList<String> words = new ArrayList<>();
 
 	// emoji
@@ -196,7 +194,6 @@ public class Predictions {
 	 */
 	private void onDbWords(ArrayList<String> dbWords, boolean isRetryAllowed) {
 		// only the first round matters, the second one is just for getting the letters for a given key
-		areThereDbWords = !dbWords.isEmpty() && isRetryAllowed;
 
 		// If there were no database words for ",a", try getting the letters only (e.g. "a", "b", "c").
 		// We do this to display them in the correct order.
@@ -234,11 +231,8 @@ public class Predictions {
 		// Make sure the displayed word and the digit sequence, we will be generating suggestions from,
 		// have the same length, to prevent visual discrepancies.
 		baseWord = (baseWord != null && !baseWord.isEmpty()) ? baseWord.substring(0, Math.min(digitSequence.length() - 1, baseWord.length())) : "";
-		int lastSequenceDigit;
 		// append all letters for the last digit in the sequence (the last pressed key)
-		// unless the user presses 1, in which we want to break from the base word and only
-		// provide punctuation marks from the user.
-		lastSequenceDigit = digitSequence.charAt(digitSequence.length() - 1) - '0';
+		int lastSequenceDigit = digitSequence.charAt(digitSequence.length() - 1) - '0';
 		for (String keyLetter : language.getKeyCharacters(lastSequenceDigit, false)) {
 			generatedWords.add(baseWord + keyLetter);
 		}
