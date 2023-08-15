@@ -125,18 +125,6 @@ public class Predictions {
 		if (loadStatic()) {
 			onWordsChanged.run();
 		} else {
-			//if user enters a 1, either query just the one key or if a user
-			//types fast and it is 1###, include 1###
-			if (digitSequence.contains("1")) {
-				DictionaryDb.getWords(
-					(words) -> onDbWords(words, true),
-					language,
-					digitSequence.substring(digitSequence.indexOf("1")),
-					stem,
-					settings.getSuggestionsMin(),
-					settings.getSuggestionsMax()
-				);
-			} else {
 				DictionaryDb.getWords(
 					(words) -> onDbWords(words, true),
 					language,
@@ -147,7 +135,6 @@ public class Predictions {
 				);
 			}
 		}
-	}
 
 
 	/**
@@ -250,12 +237,7 @@ public class Predictions {
 		// append all letters for the last digit in the sequence (the last pressed key)
 		// unless the user presses 1, in which we want to break from the base word and only
 		// provide punctuation marks from the user.
-		if (digitSequence.contains("1")) {
-			lastSequenceDigit = 1;
-			baseWord = "";
-		}	else {
-			lastSequenceDigit = digitSequence.charAt(digitSequence.length() - 1) - '0';
-		}
+		lastSequenceDigit = digitSequence.charAt(digitSequence.length() - 1) - '0';
 		for (String keyLetter : language.getKeyCharacters(lastSequenceDigit, false)) {
 			generatedWords.add(baseWord + keyLetter);
 		}

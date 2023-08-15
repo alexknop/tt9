@@ -215,8 +215,20 @@ public class DictionaryDb {
 			language.getId(),
 			maximumWords,
 			sequence,
-			filter == null || filter.equals("") ? null : filter
+			filter.equals("") ? null : filter
 		));
+		//If user types fast and sequence has a 1 in it, such as #1##,
+		// try to look for exact matches of 1###, only if previous
+		//query returned 0 matches
+		if (matches.size() == 0 && sequence.contains("1")) {
+			sequence = sequence.substring(sequence.indexOf("1"));
+			matches = new WordList(getInstance().wordsDao().getMany(
+				language.getId(),
+				maximumWords,
+				sequence,
+				filter.equals("") ? null : filter
+			));
+		}
 
 		printDebug("loadWordsExact", "===== Exact Word Matches =====", sequence, matches, start);
 		return matches.toStringList();

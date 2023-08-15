@@ -126,6 +126,12 @@ public class ModePredictive extends InputMode {
 
 		int lastAcceptedWordLength = lastAcceptedWord.length();
 		digitSequence = digitSequence.length() > lastAcceptedWordLength ? digitSequence.substring(lastAcceptedWordLength) : "";
+
+		ArrayList<String> lastSuggestions = new ArrayList<>(suggestions);
+		suggestions.clear();
+		for (String s : lastSuggestions) {
+			suggestions.add(s.length() >= lastAcceptedWordLength ? s.substring(lastAcceptedWordLength) : "");
+		}
 	}
 
 
@@ -319,6 +325,8 @@ public class ModePredictive extends InputMode {
 	 * Variant for post suggestion load analysis.
 		 * After suggestions are loaded, check if the user just typed 1,
 		 * if so then suggestion prior to 1 is to be committed.
+		 * unless the suggestion was a ', such as in French. In that case, skip and keep
+		 * the French suggestion as-is
 	 */
 	@Override
 	public boolean shouldAcceptPreviousSuggestion() {
@@ -328,6 +336,7 @@ public class ModePredictive extends InputMode {
 				!digitSequence.isEmpty()
 					&& digitSequence.contains("1")
 					&& digitSequence.charAt(0) != '1'
+					&& !(suggestions.get(0).charAt(suggestions.get(0).length()-1) == '\'')
 				  && TextTools.containsOtherThan1(digitSequence)
 			);
 	}

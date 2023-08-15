@@ -555,7 +555,7 @@ public class TraditionalT9 extends KeyPadHandler {
 		// Check to see whether we should commit whatever comes before the symbol.
 		// if user typed fast, they may be running through this code with a digitSequence of #1##
 		// (their apostrophe and whatever follows). make sure to only commit what comes before 1
-		if (mInputMode.shouldAcceptPreviousSuggestion() && mInputMode.getSuggestions().containsAll(mLanguage.getKeyCharacters(1, false) )) {
+		if (mInputMode.shouldAcceptPreviousSuggestion()) {
 			String lastComposingText = getComposingText(mInputMode.getSequenceLength() - 1);
 			commitCurrentSuggestion(false);
 			mInputMode.onAcceptSuggestion(lastComposingText, true);
