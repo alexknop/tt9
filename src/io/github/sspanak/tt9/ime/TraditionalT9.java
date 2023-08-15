@@ -552,9 +552,9 @@ public class TraditionalT9 extends KeyPadHandler {
 		// last key press makes up a compound word like: (it)'s, (I)'ve, l'(oiseau), or it is
 		// just the end of a sentence, like: "word." or "another?"
 		//
-		// Check to see whether we should commit whatever comes before the symbol.
-		// if user typed fast, they may be running through this code with a digitSequence of #1##
-		// (their apostrophe and whatever follows). make sure to only commit what comes before 1
+		// Check to see whether we should commit on symbol use and whether to include
+		// that symbol or not.
+		// If user typed fast, they may be running through this code with a digitSequence of #1##
 		if (mInputMode.shouldAcceptPreviousSuggestion()) {
 			String lastComposingText = getComposingText(mInputMode.getSequenceLength() - 1);
 			commitCurrentSuggestion(false);
