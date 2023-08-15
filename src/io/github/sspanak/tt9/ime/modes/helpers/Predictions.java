@@ -23,6 +23,7 @@ public class Predictions {
 	private Runnable onWordsChanged = () -> {};
 
 	// data
+	private boolean areThereDbWords = false;
 	private final ArrayList<String> words = new ArrayList<>();
 
 	// emoji
@@ -83,6 +84,9 @@ public class Predictions {
 		return words;
 	}
 
+	public boolean areThereDbWords() {
+		return areThereDbWords;
+	}
 
 	/**
 	 * suggestStem
@@ -194,7 +198,7 @@ public class Predictions {
 	 */
 	private void onDbWords(ArrayList<String> dbWords, boolean isRetryAllowed) {
 		// only the first round matters, the second one is just for getting the letters for a given key
-
+		areThereDbWords = !dbWords.isEmpty() && isRetryAllowed;
 		// If there were no database words for ",a", try getting the letters only (e.g. "a", "b", "c").
 		// We do this to display them in the correct order.
 		if (dbWords.isEmpty() && isRetryAllowed && digitSequence.length() == 2 && digitSequence.charAt(0) == '1' && !inputWord.isEmpty()) {
@@ -231,6 +235,7 @@ public class Predictions {
 		// Make sure the displayed word and the digit sequence, we will be generating suggestions from,
 		// have the same length, to prevent visual discrepancies.
 		baseWord = (baseWord != null && !baseWord.isEmpty()) ? baseWord.substring(0, Math.min(digitSequence.length() - 1, baseWord.length())) : "";
+
 		// append all letters for the last digit in the sequence (the last pressed key)
 		int lastSequenceDigit = digitSequence.charAt(digitSequence.length() - 1) - '0';
 		for (String keyLetter : language.getKeyCharacters(lastSequenceDigit, false)) {

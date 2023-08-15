@@ -336,7 +336,7 @@ public class ModePredictive extends InputMode {
 				!digitSequence.isEmpty()
 					&& digitSequence.contains("1")
 					&& digitSequence.charAt(0) != '1'
-					&& !(suggestions.get(0).charAt(suggestions.get(0).length()-1) == '\'')
+					&& !predictions.areThereDbWords()
 				  && TextTools.containsOtherThan1(digitSequence)
 			);
 	}
