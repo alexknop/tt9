@@ -15,6 +15,7 @@ public class Predictions {
 
 	private Language language;
 	private String digitSequence;
+	private String finalSequence;
 	private boolean isStemFuzzy;
 	private String stem;
 	private String inputWord;
@@ -58,6 +59,10 @@ public class Predictions {
 
 	public String getDigitSequence() {
 		return digitSequence;
+	}
+
+	public String getFinalSequence() {
+		return finalSequence;
 	}
 
 	public Predictions setIsStemFuzzy(boolean yes) {
@@ -129,7 +134,7 @@ public class Predictions {
 			onWordsChanged.run();
 		} else {
 			DictionaryDb.getWords(
-				(words) -> onDbWords(words, true),
+				(words) -> onDbWords(words,true),
 				language,
 				digitSequence,
 				stem,
@@ -197,6 +202,7 @@ public class Predictions {
 	 * external handler it is now possible to use it with "getList()".
 	 */
 	private void onDbWords(ArrayList<String> dbWords, boolean isRetryAllowed) {
+		String sequence = dbWords.remove(dbWords.size()-1);
 		// only the first round matters, the second one is just for getting the letters for a given key
 		areThereDbWords = !dbWords.isEmpty() && isRetryAllowed;
 		// If there were no database words for ",a", try getting the letters only (e.g. "a", "b", "c").
@@ -206,16 +212,17 @@ public class Predictions {
 			return;
 		}
 
-		if (dbWords.isEmpty() && !digitSequence.isEmpty()) {
+		if (dbWords.isEmpty() && !sequence.isEmpty()) {
 			emptyDbWarning.emitOnce(language);
-			dbWords = generatePossibleCompletions(inputWord);
+			dbWords = generatePossibleCompletions(inputWord, sequence);
 		}
 
 		words.clear();
 		suggestStem();
-		suggestMissingWords(generatePossibleStemVariations(dbWords));
-		suggestMissingWords(insertPunctuationCompletions(dbWords));
-
+		suggestMissingWords(generatePossibleStemVariations(dbWords, sequence));
+		suggestMissingWords(dbWords);
+		//lastly, set digitSequence to this current sequence
+		finalSequence = sequence;
 		onWordsChanged.run();
 	}
 
@@ -229,22 +236,22 @@ public class Predictions {
 	 * For example, if the word is "missin_" and the last pressed key is "4", the results would be:
 	 * | missing | missinh | missini |
 	 */
-	private ArrayList<String> generatePossibleCompletions(String baseWord) {
+	private ArrayList<String> generatePossibleCompletions(String baseWord, String sequence) {
 		ArrayList<String> generatedWords = new ArrayList<>();
 
 		// Make sure the displayed word and the digit sequence, we will be generating suggestions from,
 		// have the same length, to prevent visual discrepancies.
-		baseWord = (baseWord != null && !baseWord.isEmpty()) ? baseWord.substring(0, Math.min(digitSequence.length() - 1, baseWord.length())) : "";
+		baseWord = (baseWord != null && !baseWord.isEmpty()) ? baseWord.substring(0, Math.min(sequence.length() - 1, baseWord.length())) : "";
 
 		// append all letters for the last digit in the sequence (the last pressed key)
-		int lastSequenceDigit = digitSequence.charAt(digitSequence.length() - 1) - '0';
+		int lastSequenceDigit = sequence.charAt(sequence.length() - 1) - '0';
 		for (String keyLetter : language.getKeyCharacters(lastSequenceDigit, false)) {
 			generatedWords.add(baseWord + keyLetter);
 		}
 
 		// if there are no letters for this key, just append the number
 		if (generatedWords.isEmpty()) {
-			generatedWords.add(baseWord + digitSequence.charAt(digitSequence.length() - 1));
+			generatedWords.add(baseWord + sequence.charAt(sequence.length() - 1));
 		}
 
 		return generatedWords;
@@ -274,7 +281,7 @@ public class Predictions {
 		}
 
 		// generated "exact matches"
-		for (String w : generatePossibleCompletions(dbWords.get(0))) {
+		for (String w : generatePossibleCompletions(dbWords.get(0), "")) {
 			if (!dbWords.contains(w) && !dbWords.contains(w.toLowerCase(language.getLocale()))) {
 				complementedWords.add(w);
 			}
@@ -304,14 +311,14 @@ public class Predictions {
 	 * generate: "extrb" and "extrc". This is useful for typing an unknown word, that is similar to
 	 * the ones in the dictionary.
 	 */
-	private ArrayList<String> generatePossibleStemVariations(ArrayList<String> dbWords) {
+	private ArrayList<String> generatePossibleStemVariations(ArrayList<String> dbWords, String sequence) {
 		ArrayList<String> variations = new ArrayList<>();
 		if (stem.isEmpty()) {
 			return variations;
 		}
 
 		if (isStemFuzzy && stem.length() == digitSequence.length() - 1) {
-			ArrayList<String> allPossibleVariations = generatePossibleCompletions(stem);
+			ArrayList<String> allPossibleVariations = generatePossibleCompletions(stem, sequence);
 
 			// first add the known words, because it makes more sense to see them first
 			for (String variation : allPossibleVariations) {

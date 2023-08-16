@@ -21,6 +21,8 @@ public class ModePredictive extends InputMode {
 	public int getId() { return MODE_PREDICTIVE; }
 
 	private String digitSequence = "";
+
+	private String finalSequence = "";
 	private String lastAcceptedWord = "";
 
 	// stem filter
@@ -244,7 +246,7 @@ public class ModePredictive extends InputMode {
 	 * Gets the currently available Predictions and sends them over to the external caller.
 	 */
 	private void getPredictions() {
-		digitSequence = predictions.getDigitSequence();
+		digitSequence = predictions.getFinalSequence();
 		suggestions.clear();
 		suggestions.addAll(predictions.getList());
 
