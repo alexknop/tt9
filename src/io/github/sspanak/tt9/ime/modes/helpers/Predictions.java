@@ -128,14 +128,14 @@ public class Predictions {
 		if (loadStatic()) {
 			onWordsChanged.run();
 		} else {
-			DictionaryDb.getWords(
-				(words) -> onDbWords(words, true),
+			ArrayList<String> words = DictionaryDb.getWords(
 				language,
 				digitSequence,
 				stem,
 				settings.getSuggestionsMin(),
 				settings.getSuggestionsMax()
 			);
+			onDbWords(words, true);
 		}
 	}
 
@@ -176,20 +176,18 @@ public class Predictions {
 	}
 
 	private void loadWithoutLeadingPunctuation() {
-		DictionaryDb.getWords(
-			(dbWords) -> {
-				char firstChar = inputWord.charAt(0);
-				for (int i = 0; i < dbWords.size(); i++) {
-					dbWords.set(i, firstChar + dbWords.get(i));
-				}
-				onDbWords(dbWords, false);
-			},
+		ArrayList<String> dbWords = DictionaryDb.getWords(
 			language,
 			digitSequence.substring(1),
 			stem.length() > 1 ? stem.substring(1) : "",
 			settings.getSuggestionsMin(),
 			settings.getSuggestionsMax()
 		);
+		char firstChar = inputWord.charAt(0);
+		for (int i = 0; i < dbWords.size(); i++) {
+			dbWords.set(i, firstChar + dbWords.get(i));
+		}
+		onDbWords(dbWords, false);
 	}
 
 

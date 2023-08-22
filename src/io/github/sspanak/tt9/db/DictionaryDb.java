@@ -255,12 +255,7 @@ public class DictionaryDb {
 	}
 
 
-	private static void sendWords(ConsumerCompat<ArrayList<String>> dataHandler, ArrayList<String> wordList) {
-		asyncHandler.post(() -> dataHandler.accept(wordList));
-	}
-
-
-	public static void getWords(ConsumerCompat<ArrayList<String>> dataHandler, Language language, String sequence, String filter, int minimumWords, int maximumWords) {
+	public static ArrayList<String> getWords(Language language, String sequence, String filter, int minimumWords, int maximumWords) {
 		final int minWords = Math.max(minimumWords, 0);
 		final int maxWords = Math.max(maximumWords, minimumWords);
 
@@ -268,24 +263,20 @@ public class DictionaryDb {
 
 		if (sequence == null || sequence.length() == 0) {
 			Logger.w("db.getWords", "Attempting to get words for an empty sequence.");
-			sendWords(dataHandler, wordList);
-			return;
+			return wordList;
 		}
 
 		if (language == null) {
 			Logger.w("db.getWords", "Attempting to get words for NULL language.");
-			sendWords(dataHandler, wordList);
-			return;
+			return wordList;
 		}
 
-		new Thread(() -> {
-			wordList.addAll(loadWordsExact(language, sequence, filter, maxWords));
+		wordList.addAll(loadWordsExact(language, sequence, filter, maxWords));
 
-			if (sequence.length() > 1 && wordList.size() < minWords) {
-				wordList.addAll(loadWordsFuzzy(language, sequence, filter, minWords - wordList.size()));
-			}
+		if (sequence.length() > 1 && wordList.size() < minWords) {
+			wordList.addAll(loadWordsFuzzy(language, sequence, filter, minWords - wordList.size()));
+		}
 
-			sendWords(dataHandler, wordList);
-		}).start();
+		return wordList;
 	}
 }
