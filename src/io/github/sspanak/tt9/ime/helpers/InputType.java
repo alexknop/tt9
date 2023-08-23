@@ -15,23 +15,6 @@ public class InputType {
 	}
 
 
-	public boolean isValid() {
-		return field != null && connection != null;
-	}
-
-
-	/**
-	 * isLimited
-	 * Special or limited input type means the input connection is not rich,
-	 * or it can not process or show things like candidate text, nor retrieve the current text.
-	 *
-	 * More info: <a href="https://developer.android.com/reference/android/text/InputType#TYPE_NULL">android docs</a>.
-	 */
-	public boolean isLimited() {
-		return field != null && field.inputType == android.text.InputType.TYPE_NULL;
-	}
-
-
 	/**
 	 * isSpecialNumeric
 	 * Calculator and Dialer fields seem to take care of numbers and backspace on their own,

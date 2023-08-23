@@ -22,6 +22,8 @@ import io.github.sspanak.tt9.ime.helpers.InputModeValidator;
 import io.github.sspanak.tt9.ime.helpers.InputType;
 import io.github.sspanak.tt9.ime.helpers.TextField;
 import io.github.sspanak.tt9.ime.modes.InputMode;
+import io.github.sspanak.tt9.ime.modes.ModeABC;
+import io.github.sspanak.tt9.ime.modes.ModePredictive;
 import io.github.sspanak.tt9.languages.Language;
 import io.github.sspanak.tt9.languages.LanguageCollection;
 import io.github.sspanak.tt9.preferences.SettingsStore;
@@ -203,12 +205,6 @@ public class TraditionalT9 extends KeyPadHandler {
 		inputType = new InputType(currentInputConnection, input);
 		textField = new TextField(currentInputConnection, input);
 
-		if (!inputType.isValid() || inputType.isLimited()) {
-			// When the input is invalid or simple, let Android handle it.
-			onStop();
-			return;
-		}
-
 		initTyping();
 		initUi();
 
@@ -295,7 +291,7 @@ public class TraditionalT9 extends KeyPadHandler {
 			return false;
 		}
 
-		if (mInputMode.shouldSelectNextSuggestion() && !isSuggestionViewHidden()) {
+		if (mInputMode instanceof ModeABC && !isSuggestionViewHidden()) {
 			nextSuggestion();
 			scheduleAutoAccept(mInputMode.getAutoAcceptTimeout());
 		} else {

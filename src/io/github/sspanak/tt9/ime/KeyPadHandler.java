@@ -74,9 +74,11 @@ abstract class KeyPadHandler extends InputMethodService {
 	 */
 	@Override
 	public void onStartInput(EditorInfo inputField, boolean restarting) {
-		currentInputConnection = getCurrentInputConnection();
 		// Logger.d("T9.onStartInput", "inputType: " + inputField.inputType + " fieldId: " + inputField.fieldId + " fieldName: " + inputField.fieldName + " packageName: " + inputField.packageName);
-		onStart(inputField);
+		if (inputField.inputType != 0) {
+			currentInputConnection = getCurrentInputConnection();
+			onStart(inputField);
+		}
 	}
 
 
@@ -101,7 +103,7 @@ abstract class KeyPadHandler extends InputMethodService {
 	public void onFinishInput() {
 		super.onFinishInput();
 		// Logger.d("onFinishInput", "When is this called?");
-		onStop();
+		//onStop();
 	}
 
 
