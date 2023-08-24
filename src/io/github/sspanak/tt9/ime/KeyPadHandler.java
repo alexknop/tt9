@@ -43,7 +43,7 @@ abstract class KeyPadHandler extends InputMethodService {
 	@Override
 	public boolean onEvaluateInputViewShown() {
 		super.onEvaluateInputViewShown();
-		onRestart(getCurrentInputEditorInfo());
+		onStart(getCurrentInputEditorInfo());
 		return shouldBeVisible();
 	}
 
@@ -85,7 +85,7 @@ abstract class KeyPadHandler extends InputMethodService {
 	@Override
 	public void onStartInputView(EditorInfo inputField, boolean restarting) {
 		currentInputConnection = getCurrentInputConnection();
-		onRestart(inputField);
+		onStart(inputField);
 	}
 
 
@@ -288,7 +288,6 @@ abstract class KeyPadHandler extends InputMethodService {
 	// helpers
 	abstract protected void onInit();
 	abstract protected void onStart(EditorInfo inputField);
-	abstract protected void onRestart(EditorInfo inputField);
 	abstract protected void onFinishTyping();
 	abstract protected void onStop();
 

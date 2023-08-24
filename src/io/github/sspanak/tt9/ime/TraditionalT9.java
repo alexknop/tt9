@@ -202,19 +202,14 @@ public class TraditionalT9 extends KeyPadHandler {
 
 
 	protected void onStart(EditorInfo input) {
-		inputType = new InputType(currentInputConnection, input);
-		textField = new TextField(currentInputConnection, input);
-
-		initTyping();
-		initUi();
-
-		isActive = true;
-	}
-
-
-	protected void onRestart(EditorInfo inputField) {
 		if (!isActive) {
-			onStart(inputField);
+			inputType = new InputType(currentInputConnection, input);
+			textField = new TextField(currentInputConnection, input);
+
+			initTyping();
+			initUi();
+
+			isActive = true;
 		}
 	}
 
