@@ -102,8 +102,8 @@ abstract class KeyPadHandler extends InputMethodService {
 	@Override
 	public void onFinishInput() {
 		super.onFinishInput();
+		onFinishTyping();
 		// Logger.d("onFinishInput", "When is this called?");
-		//onStop();
 	}
 
 
