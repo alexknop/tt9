@@ -16,7 +16,8 @@ public class Key {
 	public static boolean isNumber(int keyCode) {
 		return
 			(keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9)
-			|| (keyCode >= KeyEvent.KEYCODE_NUMPAD_0 && keyCode <= KeyEvent.KEYCODE_NUMPAD_9);
+				|| (keyCode >= KeyEvent.KEYCODE_NUMPAD_0 && keyCode <= KeyEvent.KEYCODE_NUMPAD_9)
+			  || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN;
 	}
 
 
@@ -54,6 +55,7 @@ public class Key {
 		switch (keyCode) {
 			case KeyEvent.KEYCODE_0:
 			case KeyEvent.KEYCODE_NUMPAD_0:
+			case KeyEvent.KEYCODE_VOLUME_DOWN:
 				return 0;
 			case KeyEvent.KEYCODE_1:
 			case KeyEvent.KEYCODE_NUMPAD_1:
@@ -78,6 +80,7 @@ public class Key {
 				return settings.getUpsideDownKeys() ? 1 : 7;
 			case KeyEvent.KEYCODE_8:
 			case KeyEvent.KEYCODE_NUMPAD_8:
+			case KeyEvent.KEYCODE_VOLUME_UP:
 				return settings.getUpsideDownKeys() ? 2 : 8;
 			case KeyEvent.KEYCODE_9:
 			case KeyEvent.KEYCODE_NUMPAD_9:

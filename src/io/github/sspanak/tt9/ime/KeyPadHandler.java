@@ -207,6 +207,9 @@ abstract class KeyPadHandler extends InputMethodService {
 		if (Key.isNumber(keyCode)) {
 			numKeyRepeatCounter = (lastNumKeyCode == keyCode) ? numKeyRepeatCounter + 1 : 0;
 			lastNumKeyCode = keyCode;
+			if (keyCode == 24 || keyCode == 25) {
+				return onNumber(Key.codeToNumber(settings, keyCode), true, 0);
+			}
 			return onNumber(Key.codeToNumber(settings, keyCode), false, numKeyRepeatCounter);
 		}
 
